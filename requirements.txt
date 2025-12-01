@@ -1,0 +1,6 @@
+fastapi
+os
+shutil
+groq
+uvicorn
+python-dotenv

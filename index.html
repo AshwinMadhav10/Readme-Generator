@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI README Generator</title>
+
+<!-- Markdown Renderer -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", sans-serif;
+        background: #f2f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height: 100vh;
+    }
+
+    .wrapper {
+        display: flex;
+        width: 90%;
+        margin-top: 30px;
+        gap: 20px;
+    }
+
+    /* ------- LEFT PANEL ------- */
+    .left-panel {
+        width: 32%;
+        background: white;
+        padding: 25px;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        height: fit-content;
+    }
+
+    h1 {
+        font-size: 26px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #222;
+    }
+
+    .upload-box {
+        border: 2px dashed #bbb;
+        padding: 35px;
+        text-align: center;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: .25s;
+        background: #fafafa;
+    }
+
+    .upload-box.dragover {
+        background: #eaf0ff;
+        border-color: #4f6bf5;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        margin-top: 18px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        color: white;
+        transition: 0.2s;
+    }
+
+    #uploadBtn {
+        background: #4f6bf5;
+    }
+    #uploadBtn:hover {
+        background: #3d56e0;
+    }
+
+    #generateBtn {
+        background: #00b894;
+    }
+    #generateBtn:hover {
+        background: #009a78;
+    }
+
+    /* ------- RIGHT PANEL ------- */
+    .right-panel {
+        width: 68%;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        position: relative;
+    }
+
+    #markdownPreview {
+        height: 80vh;
+        overflow-y: auto;
+        padding: 20px;
+        background: #fafafa;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        font-family: system-ui;
+    }
+
+    /* ------- SMALL DOWNLOAD ICON ------- */
+    #downloadBtn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #4f6bf5;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: 0.2s;
+        padding: 0;
+    }
+
+    #downloadBtn:hover {
+        background: #3d56e0;
+        transform: scale(1.08);
+    }
+
+    #downloadBtn svg {
+        margin-left: 1px;
+        margin-top: 1px;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="wrapper">
+
+    <!-- LEFT SIDE -->
+    <div class="left-panel">
+        <h1>AI README Generator</h1>
+
+        <div id="uploadBox" class="upload-box">
+            <h3>Click or Drag Files</h3>
+            <p style="color:#666;margin-top:-5px;">Supports folders & multiple files</p>
+            <input type="file" id="fileInput" webkitdirectory directory multiple style="display:none;">
+        </div>
+
+        <button id="uploadBtn">Upload Files</button>
+        <button id="generateBtn">Generate README</button>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-panel">
+
+        <!-- Small round download icon -->
+        <button id="downloadBtn" title="Download README">
+            <svg width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="white" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+        </button>
+
+        <div id="markdownPreview">README preview will appear here...</div>
+    </div>
+
+</div>
+
+<script>
+const uploadBox = document.getElementById("uploadBox");
+const fileInput = document.getElementById("fileInput");
+const markdownPreview = document.getElementById("markdownPreview");
+const downloadBtn = document.getElementById("downloadBtn");
+
+// Click handler
+uploadBox.addEventListener("click", () => fileInput.click());
+
+// Drag & drop
+uploadBox.addEventListener("dragover", e => {
+    e.preventDefault();
+    uploadBox.classList.add("dragover");
+});
+uploadBox.addEventListener("dragleave", () => uploadBox.classList.remove("dragover"));
+uploadBox.addEventListener("drop", e => {
+    e.preventDefault();
+    uploadBox.classList.remove("dragover");
+    fileInput.files = e.dataTransfer.files;
+});
+
+// Upload button
+document.getElementById("uploadBtn").onclick = async () => {
+    const files = fileInput.files;
+    if (files.length === 0) return alert("Please choose files!");
+
+    const formData = new FormData();
+    for (let f of files) formData.append("files", f);
+
+    markdownPreview.innerHTML = "<b>Uploading files...</b>";
+
+    await fetch("/save", { method: "POST", body: formData });
+
+    markdownPreview.innerHTML = "<b>Files uploaded successfully!</b>";
+};
+
+// Generate README
+document.getElementById("generateBtn").onclick = async () => {
+    markdownPreview.innerHTML = "<b>Analyzing project...</b>";
+
+    // Step 1 analyze
+    await fetch("/model", { method: "POST" });
+
+    markdownPreview.innerHTML = "<b>Generating README.md...</b>";
+
+    // Step 2 generate
+    const res = await fetch("/generate-readme", { method: "POST" });
+    const blob = await res.blob();
+    const text = await blob.text();
+
+    // Render markdown beautifully
+    markdownPreview.innerHTML = marked.parse(text);
+
+    // Enable small icon
+    downloadBtn.style.display = "flex";
+
+    // Store blob globally
+    window.generatedBlob = blob;
+};
+
+// Download Button
+downloadBtn.onclick = () => {
+    const url = window.URL.createObjectURL(window.generatedBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "README.md";
+    a.click();
+};
+</script>
+
+</body>
+</html>

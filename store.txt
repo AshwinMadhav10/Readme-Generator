@@ -1,0 +1,67 @@
+FILE: app.py
+
+TECH STACK USED:
+- Python
+- Tkinter (for GUI)
+- PIL (for image processing)
+- Scikit-learn (for text vectorization and similarity calculation)
+- Base64 (for encoding and decoding)
+- IO (for input/output operations)
+
+WORKING / LOGIC SUMMARY:
+- The application is a plagiarism checker that compares the similarity between two text files.
+- It uses the TF-IDF vectorizer to convert text into numerical vectors and calculates the cosine similarity between the vectors.
+- The application has a GUI with two panels: one for file selection and controls, and another for displaying the analysis results.
+- The user can select two text files, and the application will calculate and display the similarity score between them.
+
+IMPORTANT FUNCTIONS:
+- `vectorize(Text)`: converts text into numerical vectors using TF-IDF vectorizer
+- `similarity(doc1, doc2)`: calculates the cosine similarity between two vectors
+- `check_plagiarism(file1, file2)`: calculates the similarity score between two text files
+- `analyze_plagiarism()`: analyzes the plagiarism between two selected files and displays the results
+- `upload_files()`: opens a file dialog for the user to select two text files
+- `update_file_display(file_paths)`: updates the file display area with the selected file information
+
+IMPORTANT CLASSES:
+- `ModernButton`: a custom button class with a modern design
+- `FileDropArea`: a custom file drop area class that allows users to drag and drop files
+- `ResultGauge`: a custom gauge class that displays the similarity score visually
+
+ENDPOINTS (if any):
+| Method | Route | Description |
+| --- | --- | --- |
+| None | None | This is a desktop application and does not have any endpoints |
+
+NOTES:
+- The application uses a simple and intuitive GUI to make it easy for users to select files and view the analysis results.
+- The application uses a gauge to visually represent the similarity score, making it easy to understand the results at a glance.
+- The application provides a step-by-step guide on how to use it, making it easy for new users to get started.
+
+------------------------------------
+
+FILE: README.md
+
+TECH STACK USED:
+- Python
+- scikit-learn
+
+WORKING / LOGIC SUMMARY:
+- The script performs plagiarism detection on a set of text documents using the Term Frequency-Inverse Document Frequency (TF-IDF) approach and calculates the cosine similarity between pairs of documents.
+
+IMPORTANT FUNCTIONS:
+- TF-IDF vectorization: uses scikit-learn's TF-IDF vectorizer to convert text into numerical vectors
+- Cosine similarity calculation: calculates the cosine similarity between each pair of documents to identify potential plagiarism
+
+IMPORTANT CLASSES:
+- None explicitly mentioned, but utilizes scikit-learn's TfidfVectorizer and cosine_similarity functions
+
+ENDPOINTS (if any):
+| None, as this is a script and not a web application |
+
+NOTES:
+- Requires scikit-learn library to be installed
+- Outputs pairs of documents along with their cosine similarity scores, indicating potential plagiarism
+- Licensed under the MIT License
+
+------------------------------------
+
